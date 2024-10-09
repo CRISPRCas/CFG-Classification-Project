@@ -1,0 +1,10 @@
+{
+    "num_cfgs": 3,
+    "num_strings_per_cfg": 50,
+    "str_length_range": [2, 30],
+    "non_terminals": ["S", "A", "B", "C", "D"],
+    "terminals": ["x", "y", "z", "*", "[", "6"],
+    "num_productions_range": [5, 5],
+    "production_length_range": [5, 5],
+    "terminal_probability": 0.5
+}
