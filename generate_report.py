@@ -1,6 +1,8 @@
-from statistics.analyzer import JSONLineAnalyzer
+import pprint
+from statistic_tools.analyzer import JSONLineAnalyzer
 
 if __name__=="__main__":
     analyzer = JSONLineAnalyzer('./result')
     result = analyzer.analyze()
-    print(result)
+    pp = pprint.PrettyPrinter(indent=2)
+    pp.pprint(result)

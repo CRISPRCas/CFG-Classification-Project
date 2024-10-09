@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python statistics/analyzer.py
+python generate_report.py
