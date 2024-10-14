@@ -32,9 +32,9 @@ CFG_Classification_Project/
 │        └── ...
 ├── llm_evaluator/
 │   └── evaluator.py                   # API 调用测试方法
-└── report/
+├── report/
 │   └── report-1.md                    # 实验结果报告
-└── results/
+├── results/
 │   ├── gpt-xx.jsonl                   # 实验原始结果
 ├── scripts/
 │   ├── generarun_generate_dataset.sh  # 生成随机 CFG 和测试字符串的数据集生成脚本
