@@ -1,0 +1,126 @@
+{
+    "non_terminals": [
+        "S",
+        "IF",
+        "THEN",
+        "ELSE",
+        "WHILE",
+        "LOOP"
+    ],
+    "terminals": [
+        "[",
+        "]",
+        "(",
+        ")",
+        "0",
+        "1"
+    ],
+    "productions": {
+        "S": [
+            [
+                "IF",
+                "["
+            ],
+            [
+                "[",
+                "S",
+                "S"
+            ],
+            [
+                "THEN",
+                "0",
+                "IF"
+            ],
+            [
+                "[",
+                "[",
+                "THEN",
+                ")"
+            ]
+        ],
+        "IF": [
+            [
+                ")",
+                "S",
+                "0",
+                "ELSE"
+            ],
+            [
+                "IF"
+            ],
+            [
+                "S",
+                "WHILE"
+            ],
+            [
+                "THEN",
+                "0"
+            ],
+            [
+                "LOOP"
+            ]
+        ],
+        "THEN": [
+            [
+                "ELSE"
+            ],
+            [
+                "1",
+                "ELSE",
+                "IF",
+                "ELSE",
+                "THEN"
+            ]
+        ],
+        "ELSE": [
+            [
+                "("
+            ],
+            [
+                "LOOP",
+                "S"
+            ],
+            [
+                "(",
+                "THEN"
+            ],
+            [
+                "0"
+            ],
+            [
+                "WHILE",
+                "[",
+                "ELSE"
+            ]
+        ],
+        "WHILE": [
+            [
+                "0",
+                "0",
+                "LOOP",
+                "1",
+                "LOOP"
+            ],
+            [
+                "ELSE",
+                "[",
+                ")",
+                "1"
+            ]
+        ],
+        "LOOP": [
+            [
+                "S"
+            ]
+        ]
+    },
+    "num_productions_range": [
+        1,
+        5
+    ],
+    "production_length_range": [
+        1,
+        5
+    ],
+    "terminal_probability": 0.5
+}

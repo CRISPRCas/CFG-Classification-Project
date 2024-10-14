@@ -1,0 +1,132 @@
+{
+    "non_terminals": [
+        "S",
+        "ALPHA",
+        "BETA",
+        "GAMMA"
+    ],
+    "terminals": [
+        "@",
+        "+",
+        "-",
+        "/",
+        "(",
+        ")"
+    ],
+    "productions": {
+        "S": [
+            [
+                "/",
+                "@",
+                "@",
+                "S"
+            ],
+            [
+                "+",
+                "BETA",
+                "S",
+                "GAMMA"
+            ],
+            [
+                "BETA",
+                ")",
+                "ALPHA",
+                "(",
+                "/"
+            ],
+            [
+                "(",
+                "ALPHA",
+                "ALPHA"
+            ],
+            [
+                "/",
+                "BETA",
+                "GAMMA",
+                "GAMMA",
+                "("
+            ]
+        ],
+        "ALPHA": [
+            [
+                "(",
+                "S",
+                "GAMMA",
+                "ALPHA",
+                "("
+            ],
+            [
+                "GAMMA",
+                "("
+            ],
+            [
+                "BETA",
+                "GAMMA",
+                "ALPHA"
+            ],
+            [
+                "-",
+                "S",
+                ")",
+                "S"
+            ]
+        ],
+        "BETA": [
+            [
+                "(",
+                "S",
+                "@"
+            ],
+            [
+                "GAMMA",
+                "@",
+                "+"
+            ],
+            [
+                "(",
+                "GAMMA",
+                "GAMMA",
+                "+"
+            ],
+            [
+                "GAMMA"
+            ],
+            [
+                "ALPHA",
+                "@"
+            ]
+        ],
+        "GAMMA": [
+            [
+                "("
+            ],
+            [
+                "(",
+                "BETA"
+            ],
+            [
+                "ALPHA",
+                ")",
+                "("
+            ],
+            [
+                "+",
+                "-"
+            ],
+            [
+                "S",
+                ")",
+                "GAMMA"
+            ]
+        ]
+    },
+    "num_productions_range": [
+        1,
+        5
+    ],
+    "production_length_range": [
+        1,
+        5
+    ],
+    "terminal_probability": 0.5
+}

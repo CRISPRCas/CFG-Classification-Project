@@ -1,0 +1,99 @@
+{
+    "non_terminals": [
+        "S",
+        "ALPHA",
+        "BETA",
+        "GAMMA"
+    ],
+    "terminals": [
+        "@",
+        "+",
+        "-",
+        "/",
+        "(",
+        ")"
+    ],
+    "productions": {
+        "S": [
+            [
+                "GAMMA",
+                "BETA",
+                "+",
+                "("
+            ],
+            [
+                "ALPHA",
+                "(",
+                "GAMMA",
+                "-",
+                ")"
+            ],
+            [
+                "BETA"
+            ],
+            [
+                "-",
+                "-",
+                "/",
+                "ALPHA"
+            ]
+        ],
+        "ALPHA": [
+            [
+                "GAMMA",
+                "BETA",
+                ")",
+                "-"
+            ],
+            [
+                "@"
+            ],
+            [
+                "+",
+                ")",
+                "/",
+                "(",
+                "ALPHA"
+            ],
+            [
+                "+",
+                "GAMMA",
+                ")"
+            ]
+        ],
+        "BETA": [
+            [
+                "ALPHA"
+            ],
+            [
+                "+"
+            ],
+            [
+                "BETA",
+                "BETA",
+                "GAMMA",
+                "(",
+                "GAMMA"
+            ]
+        ],
+        "GAMMA": [
+            [
+                "@"
+            ],
+            [
+                "GAMMA",
+                ")",
+                "@"
+            ]
+        ]
+    },
+    "num_productions_range": [
+        1,
+        5
+    ],
+    "production_length_range": [
+        1,
+        5
+    ],
+    "terminal_probability": 0.5
+}

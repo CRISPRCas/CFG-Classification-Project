@@ -1,0 +1,81 @@
+{
+    "non_terminals": [
+        "S",
+        "A",
+        "B",
+        "C"
+    ],
+    "terminals": [
+        "x",
+        "y",
+        "z"
+    ],
+    "productions": {
+        "S": [
+            [
+                "A"
+            ],
+            [
+                "A",
+                "A"
+            ],
+            [
+                "S"
+            ],
+            [
+                "x"
+            ],
+            [
+                "y",
+                "C",
+                "S",
+                "z"
+            ]
+        ],
+        "A": [
+            [
+                "x",
+                "B",
+                "C",
+                "y",
+                "y"
+            ],
+            [
+                "C",
+                "x",
+                "y",
+                "S",
+                "x"
+            ],
+            [
+                "B"
+            ]
+        ],
+        "B": [
+            [
+                "y",
+                "y"
+            ]
+        ],
+        "C": [
+            [
+                "y"
+            ],
+            [
+                "x",
+                "x",
+                "z",
+                "B"
+            ]
+        ]
+    },
+    "num_productions_range": [
+        1,
+        5
+    ],
+    "production_length_range": [
+        1,
+        5
+    ],
+    "terminal_probability": 0.5
+}
