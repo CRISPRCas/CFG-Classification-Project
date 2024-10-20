@@ -1,0 +1,10 @@
+{
+    "num_cfgs": 1,
+    "num_strings_per_cfg": 1000,
+    "str_length_range": [300, 500],
+    "non_terminals": ["S"],
+    "terminals": ["(", ")", "ε"],
+    "num_productions_range": [1, 5],
+    "production_length_range": [1, 5],
+    "terminal_probability": 0.5
+}

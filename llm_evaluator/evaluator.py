@@ -26,15 +26,37 @@ class CFGAcceptanceExperiment:
         dict: A dictionary containing 'result' (True/False), 'raw_response' (API response), and 'error' (if any).
         """
         # Construct the messages for the chat-based completion
+        # Reason2Conclude
+        # messages = [
+        #     {
+        #         "role": "system",
+        #         "content": "You are a CFG analyzer that determines if a string can be derived from a given context-free grammar.",
+        #     },
+        #     {
+        #         "role": "user",
+        #         "content": f"""
+        #         Task: Determine if the given string can be derived from the following CFG.
+
+        #         Context-Free Grammar (CFG):
+        #         {cfg}
+
+        #         String to Check:
+        #         "{string}"
+
+        #         Follow the CFG rules exactly and return 'True' if the string can be derived, else 'False'.
+        #         """,
+        #     },
+        # ]
+        # PureGuess
         messages = [
             {
                 "role": "system",
-                "content": "You are a CFG analyzer that determines if a string can be derived from a given context-free grammar.",
+                "content": "You are a guesser that determines if a string can be derived from a given context-free grammar (CFG) purely based on instinct, without any reasoning or analysis.",
             },
             {
                 "role": "user",
                 "content": f"""
-                Task: Determine if the given string can be derived from the following CFG.
+                Task: Make a guess whether the given string can be derived from the following CFG.
 
                 Context-Free Grammar (CFG):
                 {cfg}
@@ -42,10 +64,31 @@ class CFGAcceptanceExperiment:
                 String to Check:
                 "{string}"
 
-                Follow the CFG rules exactly and return 'True' if the string can be derived, else 'False'.
+                Return 'True' or 'False' based solely on your guess. No reasoning is required.
                 """,
             },
         ]
+        # Guess2Explain
+        # messages = [
+        #     {
+        #         "role": "system",
+        #         "content": "You are a guesser that determines if a string can be derived from a given context-free grammar (CFG). First, make a guess, and then provide an explanation for your guess.",
+        #     },
+        #     {
+        #         "role": "user",
+        #         "content": f"""
+        #         Task: First make a guess whether the given string can be derived from the following CFG.
+
+        #         Context-Free Grammar (CFG):
+        #         {cfg}
+
+        #         String to Check:
+        #         "{string}"
+
+        #         Return 'True' or 'False' based on your guess. After that, explain the reasoning behind your guess.
+        #         """,
+        #     },
+        # ]
         try:
             # Call the OpenAI chat completions API
             response = self.client.chat.completions.create(

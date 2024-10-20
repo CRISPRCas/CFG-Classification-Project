@@ -1,0 +1,32 @@
+{
+    "non_terminals": [
+        "S"
+    ],
+    "terminals": [
+        "(",
+        ")",
+        "ε"
+    ],
+    "productions": {
+        "S": [
+            [
+                "(",
+                "S",
+                ")",
+                "S"
+            ],
+            [
+                "ε"
+            ]
+        ]
+    },
+    "num_productions_range": [
+        1,
+        5
+    ],
+    "production_length_range": [
+        1,
+        5
+    ],
+    "terminal_probability": 0.5
+}
