@@ -12,7 +12,7 @@ def main(model_name, data_dir, output_file):
     print(f"Loaded {len(dataset)} test cases from {data_dir}")
 
     # 实时写入实验结果
-    with open(output_file, 'w') as f:
+    with open(output_file, 'w', encoding='utf-8') as f:
         for result in experiment.run_experiment(dataset):
             try:
                 json_line = {
@@ -23,7 +23,7 @@ def main(model_name, data_dir, output_file):
                     "llm_parsed_result": result["result"],
                     "error": result["error"]
                 }
-                f.write(json.dumps(json_line) + "\n")
+                f.write(json.dumps(json_line, ensure_ascii=False) + "\n")
             except Exception as e:
                 # 如果有错误发生，跳过这个实验结果
                 print(f"Error encountered in test case: {str(e)}")
