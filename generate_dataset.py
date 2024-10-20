@@ -7,7 +7,7 @@ import argparse
 from lark import Lark
 from cfg_generator.cfg import CFG
 
-def generate_cfg_and_strings(config):
+def generate_cfg_and_strings(config, load_existing_cfg_file=None):
     output_dir = "data"
     cfg_definitions_dir = os.path.join(output_dir, "cfg_definitions")
     corresponding_strings_dir = os.path.join(output_dir, "corresponding_strings")
@@ -30,27 +30,42 @@ def generate_cfg_and_strings(config):
         cfg_file_path = os.path.join(cfg_definitions_dir, f"cfg_{cfg_id}.json")
         strings_file_path = os.path.join(corresponding_strings_dir, f"cfg_{cfg_id}.jsonl")
 
-        # 生成随机的CFG配置
-        cfg = CFG(
-            non_terminals=non_terminals,
-            terminals=terminals,
-            num_productions_range=num_productions_range,
-            production_length_range=production_length_range,
-            terminal_probability=terminal_probability,
-        )
-        cfg.generate_terminating_cfg()
+        if load_existing_cfg_file:
+            cfg_file_path = os.path.join(cfg_definitions_dir, load_existing_cfg_file)
+            strings_file_path = os.path.join(corresponding_strings_dir, load_existing_cfg_file.replace(".json", ".jsonl"))
+            # 从指定的CFG定义文件加载CFG
+            with open(cfg_file_path, 'r') as json_file:
+                cfg_data = json.load(json_file)
+            cfg = CFG(
+                non_terminals=cfg_data['non_terminals'],
+                terminals=cfg_data['terminals'],
+                num_productions_range=cfg_data['num_productions_range'],
+                production_length_range=cfg_data['production_length_range'],
+                terminal_probability=cfg_data['terminal_probability']
+            )
+            cfg.productions = cfg_data['productions']
+        else:
+            # 生成随机的CFG配置
+            cfg = CFG(
+                non_terminals=non_terminals,
+                terminals=terminals,
+                num_productions_range=num_productions_range,
+                production_length_range=production_length_range,
+                terminal_probability=terminal_probability,
+            )
+            cfg.generate_terminating_cfg()
 
-        # 保存CFG定义到JSON文件
-        cfg_data = {
-            "non_terminals": cfg.non_terminals,
-            "terminals": cfg.terminals,
-            "productions": cfg.productions,
-            "num_productions_range": cfg.num_productions_range,
-            "production_length_range": cfg.production_length_range,
-            "terminal_probability": cfg.terminal_probability
-        }
-        with open(cfg_file_path, 'w') as json_file:
-            json.dump(cfg_data, json_file, indent=4)
+            # 保存CFG定义到JSON文件
+            cfg_data = {
+                "non_terminals": cfg.non_terminals,
+                "terminals": cfg.terminals,
+                "productions": cfg.productions,
+                "num_productions_range": cfg.num_productions_range,
+                "production_length_range": cfg.production_length_range,
+                "terminal_probability": cfg.terminal_probability
+            }
+            with open(cfg_file_path, 'w', encoding='utf-8') as json_file:
+                json.dump(cfg_data, json_file, ensure_ascii=False, indent=4)
 
         # 将CFG转换为Lark格式
         lark_grammar = cfg.cfg_to_lark()
@@ -61,13 +76,13 @@ def generate_cfg_and_strings(config):
         strings_data = []
         while len(strings_data) < num_strings_per_cfg:
             # 70% 使用 generate_string_within_length 生成，30% 随机生成
-            if random.random() < 0.7:
+            if random.random() < 0.5:
                 random_string = cfg.generate_string_within_length(*str_length_range)
             else:
                 random_string = ''.join(random.choices(cfg.terminals, k=random.randint(*str_length_range)))
 
             # 确保字符串不重复
-            if random_string in existing_strings:
+            if random_string.replace("ε", "") in existing_strings:
                 continue
 
             # 使用 Lark parser 解析字符串，确定标签
@@ -78,7 +93,7 @@ def generate_cfg_and_strings(config):
                 label = False  # 解析失败，标签为 False
 
             existing_strings.add(random_string)
-            strings_data.append({"string": random_string, "label": label})
+            strings_data.append({"string": random_string.replace("ε", ""), "label": label})
 
         # 随机打乱生成的字符串数据
         random.shuffle(strings_data)
@@ -92,6 +107,7 @@ def main():
     # 解析命令行参数
     parser = argparse.ArgumentParser(description="Generate CFG datasets.")
     parser.add_argument("--config", type=str, required=True, help="The path to the configuration JSON file.")
+    parser.add_argument("--load_existing_cfg", type=str, help="The path to an existing CFG file to load, skip generation.")
     args = parser.parse_args()
 
     # 读取配置文件
@@ -99,7 +115,7 @@ def main():
         config = json.load(config_file)
 
     # 调用生成方法
-    generate_cfg_and_strings(config)
+    generate_cfg_and_strings(config, load_existing_cfg_file=args.load_existing_cfg)
 
 
 if __name__ == "__main__":
