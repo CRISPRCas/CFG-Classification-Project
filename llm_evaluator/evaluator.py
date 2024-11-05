@@ -1,7 +1,20 @@
 import os
+import json
 from openai import OpenAI
 import time
+from lark import Lark, UnexpectedInput
 
+
+def parse_string(input_string, grammar):
+    # Define Lark parser with the provided grammar
+    parser = Lark(grammar, start='start', parser='earley')
+    
+    # Try to parse the string
+    try:
+        parser.parse(input_string)
+        return True  # Accepted
+    except UnexpectedInput:
+        return False  # Not accepted
 
 class CFGAcceptanceExperiment:
     def __init__(self, model: str = "gpt-3.5-turbo"):
@@ -48,26 +61,26 @@ class CFGAcceptanceExperiment:
         #     },
         # ]
         # PureGuess
-        messages = [
-            {
-                "role": "system",
-                "content": "You are a guesser that determines if a string can be derived from a given context-free grammar (CFG) purely based on instinct, without any reasoning or analysis.",
-            },
-            {
-                "role": "user",
-                "content": f"""
-                Task: Make a guess whether the given string can be derived from the following CFG.
+        # messages = [
+        #     {
+        #         "role": "system",
+        #         "content": "You are a guesser that determines if a string can be derived from a given context-free grammar (CFG) purely based on instinct, without any reasoning or analysis.",
+        #     },
+        #     {
+        #         "role": "user",
+        #         "content": f"""
+        #         Task: Make a guess whether the given string can be derived from the following CFG.
 
-                Context-Free Grammar (CFG):
-                {cfg}
+        #         Context-Free Grammar (CFG):
+        #         {cfg}
 
-                String to Check:
-                "{string}"
+        #         String to Check:
+        #         "{string}"
 
-                Return 'True' or 'False' based solely on your guess. No reasoning is required.
-                """,
-            },
-        ]
+        #         Return 'True' or 'False' based solely on your guess. No reasoning is required.
+        #         """,
+        #     },
+        # ]
         # Guess2Explain
         # messages = [
         #     {
@@ -89,14 +102,82 @@ class CFGAcceptanceExperiment:
         #         """,
         #     },
         # ]
+        # Function Calling
+        messages = [
+            {
+                "role": "system",
+                "content": "You are a proficient tool-using decider that determines if a string can be derived from a given context-free grammar (CFG). Whenever possible, call the provided function to obtain accurate results rather than relying on your own reasoning. The function only accpet lark grammar. To standardize grammar notation in the Lark Parser format, apply the following conventions: 1. Start Symbol Naming: Using `start` as the designated entry point for the grammar. 2. Non-terminal Naming Convention: Convert all non-terminal symbols to **LOWERCASE**. Each non-terminal should be named with lowercase letters only, reflecting the grammatical hierarchy and structure. 3. Terminal Notation: Enclose all terminal symbols in **DOUBLE QUOTES (\")**, not the single quotes (\'). This ensures consistency and clarity in differentiating terminals from non-terminals. 4. Symbol Separation: Use whitespace to separate all symbols within rules. This applies to both terminals and non-terminals, ensuring readability and uniform spacing throughout the grammar definition. For example, you need to rewrite the grammar ```S -> aS | b``` as ```start: s\ns: \"a\" s | \"b\"```. Think step by step as the following: 1. Identify all terminal symbols in the grammar. 2. Identify all non-terminal symbols in the grammar. 3. Rewrite each rule according to the given grammar rules and the Lark syntax conventions to ensure compliance with the Lark format. 4. Call the given function. 5. Give out True or False according to the function output.",
+            },
+            {
+                "role": "user",
+                "content": f"""
+                Task: Decide whether the given string can be derived from the following CFG.
+
+                Context-Free Grammar (CFG):
+                {cfg}
+
+                String to Check:
+                "{string}"
+
+                Return 'True' or 'False' based solely on the function calling. No reasoning is required.
+                """,
+            },
+        ]
+        functions = [
+            {
+                "name": "parse_string",
+                "description": "Check if the input string is accepted by the given CFG grammar",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "input_string": {
+                            "type": "string",
+                            "description": "The string to be checked against the grammar."
+                        },
+                        "grammar": {
+                            "type": "string",
+                            "description": "The CFG grammar in Lark format"
+                        },
+                    },
+                    "required": ["input_string", "grammar"],
+                },
+            },
+        ]
         try:
             # Call the OpenAI chat completions API
             response = self.client.chat.completions.create(
                 messages=messages,
                 model=self.model,
+                functions=functions,
+                function_call="auto",
             )
+            if response.choices[0].message.function_call:
+                print("======= CALL THE FUNCTION! =======")
+                function_name = response.choices[0].message.function_call.name
+                function_args = json.loads(response.choices[0].message.function_call.arguments)
+                # print(function_args)
+
+                if function_name == "parse_string":
+                    # print("======= CALL `parse_string` =======")
+                    result = parse_string(function_args["input_string"].replace("\"", ""), function_args["grammar"].replace("\'", "\""))
+
+                messages.append(
+                    {
+                        "role": "function",
+                        "name": function_name,
+                        "content": json.dumps(result),
+                    }
+                )
+                second_response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=messages,
+                )
+
+                final_message = second_response.choices[0].message.content.strip()
+            else:
+                final_message = response.choices[0].message.content.strip()
             # Extract and clean the raw response
-            raw_response = response.choices[0].message.content.strip()
+            raw_response = final_message
             # Check for 'true' and 'false' in the response
             if "true" in raw_response.lower() and "false" in raw_response.lower():
                 result = None  # Both True and False exist in the response
